@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>連結清潔台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E4E9EE;
+    --paper-2:#DCE2E9;
+    --surface:#FAFCFE;
+    --surface-2:#FFFFFF;
+    --ink:#17202A;
+    --ink-2:#4A5B6B;
+    --ink-3:#7C8A98;
+    --line:#CFD8E1;
+    --keep:#1F6A57;
+    --keep-bg:#E1EFEA;
+    --keep-line:#B7D8CD;
+    --cut:#B23A2E;
+    --cut-bg:#F6E4E1;
+    --cut-line:#E7BDB6;
+    --shadow:0 1px 2px rgba(23,32,42,.05), 0 12px 34px -18px rgba(23,32,42,.28);
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:'Noto Sans TC','IBM Plex Sans',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(120% 80% at 82% -8%, rgba(31,106,87,.10), transparent 55%),
+      radial-gradient(90% 70% at -6% 4%, rgba(23,32,42,.05), transparent 60%),
+      var(--paper);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:clamp(28px,6vw,64px) 20px 72px}
+
+  /* ---- header ---- */
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--keep);font-weight:500;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--keep);box-shadow:0 0 0 4px var(--keep-bg)}
+  h1{
+    font-family:'Bricolage Grotesque','Noto Sans TC',sans-serif;
+    font-weight:800;
+    font-size:clamp(32px,7.5vw,50px);
+    letter-spacing:-.02em;line-height:1.02;
+    margin:16px 0 12px;
+  }
+  .lede{color:var(--ink-2);font-size:clamp(15px,2.6vw,17px);max-width:46ch;margin:0}
+
+  /* ---- input ---- */
+  .panel{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);
+  }
+  .input-panel{margin-top:30px;padding:6px 6px 14px}
+  textarea{
+    width:100%;border:0;background:transparent;resize:vertical;
+    font-family:'IBM Plex Mono',monospace;font-size:15px;line-height:1.65;
+    color:var(--ink);padding:16px 16px 6px;min-height:96px;outline:none;
+  }
+  textarea::placeholder{color:var(--ink-3)}
+  .input-actions{display:flex;gap:8px;padding:0 12px;align-items:center}
+  .txt-btn{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-2);
+    background:transparent;border:0;cursor:pointer;padding:6px 10px;border-radius:8px;
+    letter-spacing:.02em;
+  }
+  .txt-btn:hover{background:var(--paper-2);color:var(--ink)}
+  .txt-btn:focus-visible{outline:2px solid var(--keep);outline-offset:2px}
+  .spacer{flex:1}
+  .char-note{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-3)}
+
+  /* ---- result ---- */
+  .result{margin-top:22px;display:none}
+  .result.show{display:block}
+  .summary{
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-2);
+    margin:0 4px 12px;
+  }
+  .summary b{color:var(--ink);font-weight:600}
+  .summary .metric{color:var(--ink-3)}
+  .summary .metric s{color:var(--cut);text-decoration-thickness:1.5px}
+
+  .breakdown{padding:18px 18px 8px}
+  .bd-base{
+    font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--ink);
+    word-break:break-all;line-height:1.7;
+    padding:10px 12px;background:var(--paper);border-radius:10px;border:1px solid var(--line);
+  }
+  .bd-base .scheme{color:var(--ink-3)}
+  .group{margin-top:16px}
+  .group-label{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;margin:0 0 8px;display:flex;align-items:center;gap:7px;
+  }
+  .group-label.keep{color:var(--keep)}
+  .group-label.cut{color:var(--cut)}
+  .group-label .tick{width:6px;height:6px;border-radius:2px}
+  .group-label.keep .tick{background:var(--keep)}
+  .group-label.cut .tick{background:var(--cut)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    padding:6px 11px;border-radius:9px;border:1px solid;max-width:100%;
+    display:inline-flex;align-items:baseline;gap:0;position:relative;overflow:hidden;
+  }
+  .chip .k{font-weight:600}
+  .chip .v{opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;display:inline-block;vertical-align:bottom}
+  .chip.keep{color:var(--keep);background:var(--keep-bg);border-color:var(--keep-line)}
+  .chip.cut{color:var(--cut);background:var(--cut-bg);border-color:var(--cut-line)}
+  .chip.cut .k,.chip.cut .v{position:relative}
+  .chip.cut .k::after,.chip.cut .v::after{
+    content:"";position:absolute;left:-1px;right:-1px;top:52%;height:1.5px;background:var(--cut);
+    transform:scaleX(0);transform-origin:left;animation:strike .34s .05s ease forwards;
+  }
+  @keyframes strike{to{transform:scaleX(1)}}
+
+  /* ---- clean output ---- */
+  .out{
+    margin-top:20px;background:var(--ink);border-radius:var(--r);
+    padding:18px;box-shadow:var(--shadow);
+    animation:rise .38s ease both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .out-label{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:#8CA9A0;margin:0 0 10px;
+  }
+  .out-url{
+    font-family:'IBM Plex Mono',monospace;font-size:14px;line-height:1.7;
+    color:#EAF3F0;word-break:break-all;user-select:all;
+  }
+  .out-url .fade{color:#7F978F}
+  .copy-btn{
+    margin-top:16px;width:100%;border:0;cursor:pointer;
+    background:var(--keep);color:#fff;
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:15px;
+    padding:14px;border-radius:11px;letter-spacing:.02em;
+    transition:background .15s, transform .05s;
+  }
+  .copy-btn:hover{background:#1a5a49}
+  .copy-btn:active{transform:translateY(1px)}
+  .copy-btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .copy-btn.done{background:#2c7d69}
+
+  /* ---- empty / error state ---- */
+  .hint{
+    margin-top:22px;padding:20px;border:1px dashed var(--line);border-radius:var(--r);
+    color:var(--ink-3);font-size:14px;text-align:center;background:rgba(255,255,255,.4);
+  }
+  .hint.err{border-color:var(--cut-line);color:var(--cut);background:var(--cut-bg)}
+
+  /* ---- bookmarklet ---- */
+  .bm{margin-top:44px;padding:24px;position:relative}
+  .bm::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;background:var(--line)}
+  .bm h2{
+    font-family:'Bricolage Grotesque','Noto Sans TC',sans-serif;font-weight:800;
+    font-size:22px;letter-spacing:-.01em;margin:6px 0 8px;
+  }
+  .bm p{color:var(--ink-2);font-size:14px;margin:0 0 18px}
+  .bm-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .bm-pill{
+    display:inline-flex;align-items:center;gap:9px;
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:14.5px;
+    color:var(--ink);text-decoration:none;
+    background:var(--surface-2);border:1px solid var(--line);
+    padding:11px 16px;border-radius:11px;cursor:grab;
+    box-shadow:0 1px 0 rgba(23,32,42,.04);
+  }
+  .bm-pill:hover{border-color:var(--keep-line);background:var(--keep-bg);color:var(--keep)}
+  .bm-pill:active{cursor:grabbing}
+  .bm-code-btn{
+    font-family:'Noto Sans TC',sans-serif;font-weight:600;font-size:13.5px;
+    color:var(--ink-2);background:transparent;border:1px solid var(--line);
+    padding:11px 15px;border-radius:11px;cursor:pointer;
+  }
+  .bm-code-btn:hover{background:var(--paper-2);color:var(--ink)}
+  .bm-code-btn.done{color:var(--keep);border-color:var(--keep-line);background:var(--keep-bg)}
+  .bm-note{margin-top:16px;font-size:12.5px;color:var(--ink-3);line-height:1.7}
+  .bm-note code{font-family:'IBM Plex Mono',monospace;background:var(--paper-2);padding:1px 6px;border-radius:5px;color:var(--ink-2)}
+
+  footer{
+    margin-top:40px;font-size:12.5px;color:var(--ink-3);line-height:1.8;text-align:left;
+    border-top:1px solid var(--line);padding-top:20px;
+  }
+  footer code{font-family:'IBM Plex Mono',monospace;color:var(--ink-2)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important}
+    .chip.cut .k::after,.chip.cut .v::after{transform:scaleX(1)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow"><span class="dot"></span>純前端工具 · 不連網</span>
+    <h1>連結清潔台</h1>
+    <p class="lede">貼上任何連結，自動去掉 Facebook 與各種追蹤參數，複製乾淨的版本。</p>
+  </header>
+
+  <section class="panel input-panel">
+    <textarea id="in" spellcheck="false" placeholder="把連結貼在這裡…"></textarea>
+    <div class="input-actions">
+      <button class="txt-btn" id="sample">貼上範例</button>
+      <button class="txt-btn" id="clear">清空</button>
+      <span class="spacer"></span>
+      <span class="char-note" id="charnote"></span>
+    </div>
+  </section>
+
+  <div class="hint" id="hint">結果會顯示在這裡：哪些片段保留、哪些追蹤參數被移除。</div>
+
+  <section class="result" id="result">
+    <div class="summary" id="summary"></div>
+    <div class="panel breakdown" id="breakdown"></div>
+    <div class="out">
+      <p class="out-label">乾淨連結</p>
+      <div class="out-url" id="outurl"></div>
+      <button class="copy-btn" id="copy">複製乾淨連結</button>
+    </div>
+  </section>
+
+  <section class="panel bm">
+    <h2>一鍵書籤</h2>
+    <p>在任何 Facebook 頁面點一下，直接清理目前網址並複製到剪貼簿——不用再回到這一頁。</p>
+    <div class="bm-row">
+      <a class="bm-pill" id="bmlink" href="#" onclick="return false;" title="拖我到書籤列">🧷 清潔這條連結</a>
+      <button class="bm-code-btn" id="bmcopy">複製書籤程式碼</button>
+    </div>
+    <p class="bm-note">
+      把上面的膠囊按鈕<b>拖到瀏覽器書籤列</b>就完成安裝。<br>
+      手機、或拖不動時：按「複製書籤程式碼」，新增一個書籤，把它貼進<code>網址</code>欄即可。
+    </p>
+  </section>
+
+  <footer>
+    所有處理都在你的瀏覽器裡完成，連結不會傳到任何伺服器。<br>
+    移除的都是追蹤與轉址用的參數（<code>fbclid</code>、<code>rdid</code>、<code>__cft__</code>、<code>utm_*</code> 等），不會改變連結真正指向的內容。Facebook 頁面另外只保留 <code>story_fbid</code>、<code>id</code>、<code>v</code> 等功能性參數。
+  </footer>
+</div>
+
+<script>
+/* ---- rules (keep in sync with the bookmarklet string below) ---- */
+const GLOBAL_TRACKING = new Set([
+  'fbclid','gclid','gclsrc','dclid','gbraid','wbraid','msclkid','yclid','twclid','ttclid',
+  'igshid','igsh','mc_cid','mc_eid','_openstat','si','trk','_hsenc','_hsmi','mkt_tok',
+  'vero_id','oly_anon_id','oly_enc_id','wickedid','soc_src','soc_trk'
+]);
+const FB_HOSTS = ['facebook.com','m.facebook.com','web.facebook.com','mbasic.facebook.com','fb.com','fb.watch'];
+const FB_KEEP = new Set(['story_fbid','id','fbid','set','v','photo_id','comment_id','multi_permalinks']);
+
+function extractUrl(raw){
+  raw = (raw||'').trim();
+  if(!raw) return null;
+  const m = raw.match(/https?:\/\/[^\s"'<>]+/i);
+  let c = m ? m[0] : raw;
+  c = c.replace(/[)\]}.,;]+$/,'');
+  return c;
+}
+function cleanUrl(raw){
+  const c = extractUrl(raw);
+  if(!c) return {ok:false, empty:true};
+  let u;
+  try { u = new URL(c); } catch(e){
+    try { u = new URL('https://'+c); } catch(e2){ return {ok:false, error:true}; }
+  }
+  const bare = u.hostname.toLowerCase().replace(/^www\./,'');
+  if(bare==='l.facebook.com'||bare==='lm.facebook.com'||bare==='l.instagram.com'){
+    const t = u.searchParams.get('u') || u.searchParams.get('url');
+    if(t) return cleanUrl(decodeURIComponent(t));
+  }
+  const isFB = FB_HOSTS.includes(bare);
+  const kept=[], removed=[];
+  const np = new URLSearchParams();
+  for(const [k,v] of Array.from(u.searchParams.entries())){
+    const kl = k.toLowerCase();
+    const rm = isFB ? !FB_KEEP.has(k) : (kl.startsWith('utm_') || GLOBAL_TRACKING.has(kl));
+    if(rm) removed.push({k,v}); else { kept.push({k,v}); np.append(k,v); }
+  }
+  u.search = np.toString();
+  const hashBody = u.hash ? u.hash.split('#').join('').trim() : '';
+  const emptyHash = !!u.hash && !hashBody;
+  if(!hashBody) u.hash='';
+  const cleaned = u.toString().replace(/\?$/,'');
+  return {ok:true, cleaned, isFB, origin:u.origin, path:u.pathname, kept, removed, emptyHash, orig:c};
+}
+
+/* ---- DOM ---- */
+const $ = id => document.getElementById(id);
+const inEl=$('in'), hintEl=$('hint'), resEl=$('result'),
+      sumEl=$('summary'), bdEl=$('breakdown'), outEl=$('outurl'),
+      copyEl=$('copy'), charEl=$('charnote');
+
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cut = (s,n)=> s.length>n ? s.slice(0,n)+'…' : s;
+
+function chip(p, kind){
+  const v = p.v!=='' ? '<span class="v">='+esc(cut(p.v,26))+'</span>' : '';
+  return '<span class="chip '+kind+'"><span class="k">'+esc(p.k)+'</span>'+v+'</span>';
+}
+function group(label, kind, items){
+  if(!items.length) return '';
+  return '<div class="group"><p class="group-label '+kind+'"><span class="tick"></span>'+label+'</p>'
+       + '<div class="chips">'+items.map(p=>chip(p,kind)).join('')+'</div></div>';
+}
+
+let current = '';
+
+function render(){
+  const raw = inEl.value;
+  charEl.textContent = raw.trim() ? raw.trim().length + ' 字元' : '';
+  if(!raw.trim()){
+    resEl.classList.remove('show'); hintEl.style.display='';
+    hintEl.className='hint'; hintEl.textContent='結果會顯示在這裡：哪些片段保留、哪些追蹤參數被移除。';
+    return;
+  }
+  const r = cleanUrl(raw);
+  if(!r.ok){
+    resEl.classList.remove('show'); hintEl.style.display='';
+    hintEl.className='hint err'; hintEl.textContent='看起來不是有效的網址，檢查一下再貼一次。';
+    return;
+  }
+  hintEl.style.display='none';
+  resEl.classList.add('show');
+  current = r.cleaned;
+
+  // summary
+  const n = r.removed.length;
+  const oLen = r.orig.length, cLen = r.cleaned.length;
+  let sum = n>0
+    ? '<b>移除 '+n+' 個追蹤參數</b>'
+    : '<b>這條已經很乾淨</b>';
+  if(r.emptyHash) sum += (n>0?'，':'') + '並清掉了結尾的空 #';
+  sum += '<span class="metric"> · ' + (cLen<oLen ? '<s>'+oLen+'</s> ' : '') + cLen + ' 字元</span>';
+  sumEl.innerHTML = sum;
+
+  // breakdown
+  const base = r.origin + r.path;
+  const scheme = base.match(/^https?:\/\//)[0];
+  let html = '<div class="bd-base"><span class="scheme">'+scheme+'</span>'+esc(base.slice(scheme.length))+'</div>';
+  html += group('保留', 'keep', r.kept);
+  html += group('移除', 'cut', r.removed);
+  bdEl.innerHTML = html;
+
+  // clean output (fade the query part visually)
+  const qi = r.cleaned.indexOf('?');
+  if(qi>-1){
+    outEl.innerHTML = esc(r.cleaned.slice(0,qi)) + '<span class="fade">'+esc(r.cleaned.slice(qi))+'</span>';
+  } else {
+    outEl.textContent = r.cleaned;
+  }
+  copyEl.classList.remove('done'); copyEl.textContent='複製乾淨連結';
+}
+
+function copyText(text, btn, doneLabel, restoreLabel){
+  const after = ok => {
+    if(ok){ btn.classList.add('done'); btn.textContent=doneLabel;
+      setTimeout(()=>{ btn.classList.remove('done'); btn.textContent=restoreLabel; }, 1600); }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>after(true), ()=>fallback());
+  } else fallback();
+  function fallback(){
+    try{
+      const t=document.createElement('textarea'); t.value=text;
+      t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t);
+      t.focus(); t.select(); document.execCommand('copy'); t.remove(); after(true);
+    }catch(e){ after(false); }
+  }
+}
+
+inEl.addEventListener('input', render);
+$('sample').addEventListener('click', ()=>{
+  inEl.value='https://www.facebook.com/im5481.blog/posts/pfbid02RU7VhwA5RvggcnUwCPPP2XQ1R5FN7UtYN4189KaBe16H4Jf85wGy5q6W9ceYsMoal?rdid=5kICE9fVY9RfoVAf#';
+  render(); inEl.focus();
+});
+$('clear').addEventListener('click', ()=>{ inEl.value=''; render(); inEl.focus(); });
+copyEl.addEventListener('click', ()=> copyText(current, copyEl, '已複製 ✓', '複製乾淨連結'));
+
+/* ---- bookmarklet (single line, no regex, no backticks inside) ---- */
+const BOOKMARKLET = "javascript:(function(){var G=['fbclid','gclid','gclsrc','dclid','gbraid','wbraid','msclkid','yclid','twclid','ttclid','igshid','igsh','mc_cid','mc_eid','_openstat','si','trk','_hsenc','_hsmi','mkt_tok','vero_id','soc_src','soc_trk'];var FBK=['story_fbid','id','fbid','set','v','photo_id','comment_id','multi_permalinks'];var FBH=['facebook.com','m.facebook.com','web.facebook.com','mbasic.facebook.com','fb.com','fb.watch'];function bare(h){h=h.toLowerCase();return h.indexOf('www.')===0?h.slice(4):h;}function clean(raw){var u;try{u=new URL(raw)}catch(e){return raw}var b=bare(u.hostname);if(b==='l.facebook.com'||b==='lm.facebook.com'||b==='l.instagram.com'){var t=u.searchParams.get('u')||u.searchParams.get('url');if(t)return clean(decodeURIComponent(t))}var fb=FBH.indexOf(b)>-1;var np=new URLSearchParams();u.searchParams.forEach(function(v,k){var kl=k.toLowerCase();var rm=fb?FBK.indexOf(k)<0:(kl.indexOf('utm_')===0||G.indexOf(kl)>-1);if(!rm)np.append(k,v)});u.search=np.toString();var hs=u.hash?u.hash.split('#').join('').trim():'';if(!hs)u.hash='';var s=u.toString();if(s.charAt(s.length-1)==='?')s=s.slice(0,-1);return s}function toast(m,ok){var d=document.createElement('div');d.textContent=m;d.style.cssText='position:fixed;z-index:2147483647;left:50%;top:20px;transform:translateX(-50%);background:'+(ok?'#1F6A57':'#B23A2E')+';color:#fff;font:600 14px/1.45 -apple-system,system-ui,sans-serif;padding:12px 18px;border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.28);max-width:90vw;word-break:break-all';document.body.appendChild(d);setTimeout(function(){d.style.transition='opacity .45s';d.style.opacity='0';setTimeout(function(){d.remove()},450)},2600)}var out=clean(location.href);function ok(){toast('已複製乾淨連結 ✓',true)}function fb2(){try{var t=document.createElement('textarea');t.value=out;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.focus();t.select();document.execCommand('copy');t.remove();ok()}catch(e){toast('請手動複製：'+out,false)}}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(out).then(ok,fb2)}else{fb2()}})();";
+$('bmlink').setAttribute('href', BOOKMARKLET);
+$('bmcopy').addEventListener('click', ()=> copyText(BOOKMARKLET, $('bmcopy'), '已複製 ✓', '複製書籤程式碼'));
+
+render();
+</script>
+</body>
+</html>
